@@ -1,0 +1,42 @@
+FROM scalified/alpine-cron:latest
+
+ENV GDRIVE_HOME /root/gdrive
+ENV GDRIVE_CONFIG_DIR /root/.config/gdrive
+ENV BACKUP_SCRIPTS_DIR /root/.scripts
+ENV CRONTABS_DIR /var/spool/cron/crontabs
+ENV ROOT_CRONTABS_FILE $CRONTABS_DIR/root
+ENV CRON_LOG_DIR /var/log/crond
+ENV GDRIVE_URL https://docs.google.com/uc?id=0B3X9GlR6EmbnWksyTEtCM0VfaFE&export=download
+ENV SSH_DIR /root/.ssh
+ENV BACKUP_DIR /root/.backup
+
+RUN apk add --update --no-cache wget \
+	jq util-linux
+
+RUN wget --output-document="/tmp/gdrive" $GDRIVE_URL --no-check-certificate
+
+RUN cd /tmp && chmod u+x gdrive
+
+RUN mkdir -p $BACKUP_SCRIPTS_DIR $CRON_LOG_DIR \	
+	$GDRIVE_HOME $GDRIVE_CONFIG_DIR $SSH_DIR $BACKUP_DIR
+
+RUN install /tmp/gdrive $GDRIVE_HOME/gdrive \
+    && chmod u+x $GDRIVE_HOME/gdrive     
+
+COPY scripts/backup.sh scripts/backup_dir.sh scripts/backup_mongo.sh $BACKUP_SCRIPTS_DIR/
+
+RUN chmod u+x $BACKUP_SCRIPTS_DIR/backup.sh $BACKUP_SCRIPTS_DIR/backup_dir.sh \
+    $BACKUP_SCRIPTS_DIR/backup_mongo.sh \
+    && echo "TZ=UTC" >> $ROOT_CRONTABS_FILE \
+	&& echo "00      20      *       *       1-5     $BACKUP_SCRIPTS_DIR/backup_dir.sh -h swupp-squash-tm.mircloud.us -s /opt/backup/squash-tm -t /tmp/backup-squash-tm >> $CRON_LOG_DIR/backup.log" >> $ROOT_CRONTABS_FILE \
+	&& echo "00      07      *       *       1-5     $BACKUP_SCRIPTS_DIR/backup_dir.sh -h swupp-squash-tm.mircloud.us -s /opt/backup/squash-tm -t /tmp/backup-squash-tm -m "*.txt" >> $CRON_LOG_DIR/backup.log" >> $ROOT_CRONTABS_FILE
+
+RUN dos2unix $BACKUP_SCRIPTS_DIR/backup.sh $BACKUP_SCRIPTS_DIR/backup_dir.sh \
+	$BACKUP_SCRIPTS_DIR/backup_mongo.sh    
+
+VOLUME $BACKUP_SCRIPTS_DIR
+VOLUME $BACKUP_DIR
+VOLUME $GDRIVE_HOME
+VOLUME $GDRIVE_CONFIG_DIR
+VOLUME $CRONTABS_DIR
+VOLUME $SSH_DIR
