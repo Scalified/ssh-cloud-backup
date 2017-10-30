@@ -5,3 +5,9 @@
 0	2	*	*	*	run-parts /etc/periodic/daily
 0	3	*	*	6	run-parts /etc/periodic/weekly
 0	5	1	*	*	run-parts /etc/periodic/monthly
+
+TZ=UTC
+00      20      *       *       1-5     /root/.scripts/backup_dir.sh -h swupp-squash-tm.mircloud.us -s /opt/backup/squash-tm -t /tmp/backup-squash-tm -a true >> /var/log/crond/backup.log
+00      21      *       *       1-5     /root/.scripts/backup_dir.sh -h swupp-squash-tm.mircloud.us -s /opt/backup/squash-tm -t /tmp/backup-squash-tm >> /var/log/crond/backup.log
+00      08      *       *       1-5     /root/.scripts/backup_dir.sh -h swupp-squash-tm.mircloud.us -s /opt/backup/squash-tm -t /tmp/backup-squash-tm -m .txt >> /var/log/crond/backup.log
+00      09      *       *       1-5     /root/.scripts/backup_dir.sh -h swupp-squash-tm.mircloud.us -s /opt/backup/squash-tm -t /tmp/backup-squash-tm -m 1.txt >> /var/log/crond/backup.log

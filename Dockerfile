@@ -3,7 +3,7 @@ FROM scalified/alpine-cron:latest
 ENV RCLONE_HOME /opt/rclone
 ENV RCLONE_CONFIG_DIR /root/.config/rclone
 ENV BACKUP_SCRIPTS_DIR /root/.scripts
-ENV CRONTABS_DIR /var/spool/cron/crontabs
+ENV CRONTABS_DIR /etc/crontabs
 ENV ROOT_CRONTABS_FILE $CRONTABS_DIR/root
 ENV CRON_LOG_DIR /var/log/crond
 ENV SSH_DIR /root/.ssh
