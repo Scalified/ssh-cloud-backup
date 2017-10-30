@@ -49,12 +49,11 @@ RUN dos2unix $BACKUP_SCRIPTS_DIR/backup_dir.sh \
     $BACKUP_SCRIPTS_DIR/downloadPath.sh \
     $BACKUP_SCRIPTS_DIR/rcloneUploadPath.sh          
 
-RUN chmod u+x $BACKUP_SCRIPTS_DIR/backup_dir.sh \
-    && echo "TZ=UTC" >> $ROOT_CRONTABS_FILE \
-    && echo "00      20      *       *       1-5     $BACKUP_SCRIPTS_DIR/backup_dir.sh -h swupp-squash-tm.mircloud.us -s /opt/backup/squash-tm -t /tmp/backup-squash-tm -a true >> $CRON_LOG_DIR/backup.log" >> $ROOT_CRONTABS_FILE \
-    && echo "00      21      *       *       1-5     $BACKUP_SCRIPTS_DIR/backup_dir.sh -h swupp-squash-tm.mircloud.us -s /opt/backup/squash-tm -t /tmp/backup-squash-tm >> $CRON_LOG_DIR/backup.log" >> $ROOT_CRONTABS_FILE \
-    && echo "00      08      *       *       1-5     $BACKUP_SCRIPTS_DIR/backup_dir.sh -h swupp-squash-tm.mircloud.us -s /opt/backup/squash-tm -t /tmp/backup-squash-tm -m .txt >> $CRON_LOG_DIR/backup.log" >> $ROOT_CRONTABS_FILE \
-    && echo "00      09      *       *       1-5     $BACKUP_SCRIPTS_DIR/backup_dir.sh -h swupp-squash-tm.mircloud.us -s /opt/backup/squash-tm -t /tmp/backup-squash-tm -m 1.txt >> $CRON_LOG_DIR/backup.log" >> $ROOT_CRONTABS_FILE
+RUN chmod u+x $BACKUP_SCRIPTS_DIR/backup_dir.sh
+
+COPY crontabs/root $CRONTABS_DIR
+
+RUN chmod 600 $ROOT_CRONTABS_FILE
           
 VOLUME $BACKUP_DIR
 VOLUME $SSH_DIR
