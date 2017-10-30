@@ -33,11 +33,11 @@ backup() {
 
                 DESTINATION_REMOTE_PATH="/tmp"
                 
-                sh archiveRemotePath.sh -u ${USER} -s ${SOURCE_HOST} -f ${SOURCE_INPUT_PATH} -m ${DESTINATION_REMOTE_PATH}/${BACKUP_ARCHIVE_NAME}
+                sh ${BACKUP_SCRIPTS_DIR}/archiveRemotePath.sh -u ${USER} -s ${SOURCE_HOST} -f ${SOURCE_INPUT_PATH} -m ${DESTINATION_REMOTE_PATH}/${BACKUP_ARCHIVE_NAME}
                 
-                sh downloadFiles.sh -u ${USER} -s ${SOURCE_HOST} -f ${DESTINATION_REMOTE_PATH} -m ${BACKUP_ARCHIVE_NAME} -d ${BACKUP_DIR}/${SOURCE_HOST}                
+                sh ${BACKUP_SCRIPTS_DIR}/downloadFiles.sh -u ${USER} -s ${SOURCE_HOST} -f ${DESTINATION_REMOTE_PATH} -m ${BACKUP_ARCHIVE_NAME} -d ${BACKUP_DIR}/${SOURCE_HOST}                
                 
-                sh rcloneUploadPath.sh -s ${BACKUP_DIR}/${SOURCE_HOST} -n ${RCLONE_REMOTE_NAME} -d ${SOURCE_HOST}                                                 
+                sh ${BACKUP_SCRIPTS_DIR}/rcloneUploadPath.sh -s ${BACKUP_DIR}/${SOURCE_HOST} -n ${RCLONE_REMOTE_NAME} -d ${SOURCE_HOST}                                                 
             else
                 echo "The optional parameter -a must be set to \"true\""
                 exit 1;
@@ -46,24 +46,24 @@ backup() {
             exit 0;
         elif [ -n "${BACKUP_FILE_MASK}" ]        
         then
-            sh downloadFiles.sh -u ${USER} -s ${SOURCE_HOST} -f ${SOURCE_INPUT_PATH} -d ${DESTINATION_OUTPUT_PATH} -m ${BACKUP_FILE_MASK}
+            sh ${BACKUP_SCRIPTS_DIR}/downloadFiles.sh -u ${USER} -s ${SOURCE_HOST} -f ${SOURCE_INPUT_PATH} -d ${DESTINATION_OUTPUT_PATH} -m ${BACKUP_FILE_MASK}
 
-            sh arhiveLocalPath.sh -s ${DESTINATION_OUTPUT_PATH} -d ${BACKUP_DIR}/${SOURCE_HOST}
+            sh ${BACKUP_SCRIPTS_DIR}/arhiveLocalPath.sh -s ${DESTINATION_OUTPUT_PATH} -d ${BACKUP_DIR}/${SOURCE_HOST}
             
             rm -rf ${DESTINATION_OUTPUT_PATH}
             
-            sh rcloneUploadPath.sh -s ${BACKUP_DIR}/${SOURCE_HOST} -n ${RCLONE_REMOTE_NAME} -d ${SOURCE_HOST}                    
+            sh ${BACKUP_SCRIPTS_DIR}/rcloneUploadPath.sh -s ${BACKUP_DIR}/${SOURCE_HOST} -n ${RCLONE_REMOTE_NAME} -d ${SOURCE_HOST}                    
             
             exit 0;
         elif [ -n "SOURCE_INPUT_PATH" ]
         then
-            sh downloadPath.sh -u ${USER} -s ${SOURCE_HOST} -f ${SOURCE_INPUT_PATH} -d ${DESTINATION_OUTPUT_PATH}
+            sh ${BACKUP_SCRIPTS_DIR}/downloadPath.sh -u ${USER} -s ${SOURCE_HOST} -f ${SOURCE_INPUT_PATH} -d ${DESTINATION_OUTPUT_PATH}
 
-            sh arhiveLocalPath.sh -s ${DESTINATION_OUTPUT_PATH} -d ${BACKUP_DIR}/${SOURCE_HOST}
+            sh ${BACKUP_SCRIPTS_DIR}/arhiveLocalPath.sh -s ${DESTINATION_OUTPUT_PATH} -d ${BACKUP_DIR}/${SOURCE_HOST}
 
             rm -rf ${DESTINATION_OUTPUT_PATH}
             
-            sh rcloneUploadPath.sh -s ${BACKUP_DIR}/${SOURCE_HOST} -n ${RCLONE_REMOTE_NAME} -d ${SOURCE_HOST}                     
+            sh ${BACKUP_SCRIPTS_DIR}/rcloneUploadPath.sh -s ${BACKUP_DIR}/${SOURCE_HOST} -n ${RCLONE_REMOTE_NAME} -d ${SOURCE_HOST}                     
 
             exit 0;
         else
