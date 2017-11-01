@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Parsing arguments
 while getopts "s:f:m:u:q" opt
@@ -17,5 +17,5 @@ echo "About to archive ${SOURCE_INPUT_PATH} into ${SOURCE_OUTPUT_PATH} at ${SOUR
 
 ssh ${USER}@${SOURCE_HOST} "tar -cvzf ${SOURCE_OUTPUT_PATH} ${SOURCE_INPUT_PATH}"
 
-echo "Completed remote file to archive."
+echo "${SOURCE_INPUT_PATH} remote path archiving completed."
 

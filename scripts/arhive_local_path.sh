@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Parsing arguments
 while getopts "s:d:q" opt
@@ -19,5 +19,5 @@ BACKUP_ARCHIVE_NAME="$(date '+%Y-%m-%d-%H%M').tar.gz"
 
 tar -cvzf ${DESTINATION_OUTPUT_PATH}/${BACKUP_ARCHIVE_NAME} ${SOURCE_INPUT_PATH}
 
-echo "Completed archiving."
+echo "${SOURCE_INPUT_PATH} local path archiving completed."
 

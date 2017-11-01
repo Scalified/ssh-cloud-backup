@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Parsing arguments
 while getopts "s:d:n:q" opt
@@ -16,5 +16,5 @@ echo "About to upload the local folder ${SOURCE_INPUT_PATH} to ${DESTINATION_OUT
      
 rclone copy ${SOURCE_INPUT_PATH} ${RCLONE_REMOTE_NAME}:/${DESTINATION_OUTPUT_PATH}
 
-echo "Completed uploading."
+echo "Completed ${SOURCE_INTPUT_PATH} path uploading to ${DESTINATION_OUTPUT_PATH} path."
 

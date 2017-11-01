@@ -1,66 +1,74 @@
-#!/bin/sh
-
-set -e
+#!/bin/bash
 
 USER=root
 BACKUP_DIR=~/.backup
 RCLONE_REMOTE_NAME="auto-backup"
 
-# Parsing arguments
-while getopts "s:n:d:u:q" opt
-do
+  # Parsing arguments
+  while getopts "s:d:o:q" opt
+  do
     case $opt in
       s) SOURCE_HOST=$OPTARG;;
-      n) DATA_BASE_NAME=$OPTARG;;
-      d) DESTINATION_OUTPUT_PATH=$OPTARG;;  
+      d) DATABASE_NAME=$OPTARG;;
+      o) DESTINATION_OUTPUT_PATH=$OPTARG;;  
       q) QUIT=1;;
       :|\?) exit 1;;
-    esac
-done
+  esac
+  done
 
-      #m) FILE_MASK=$OPTARG;;
+validate() {
+  # Required params
+  if [ -z "${SOURCE_HOST}" ]
+  then
+    echo "-s <SOURCE_HOST> is required" && exit 1
+  fi
 
-# Required params
-[ -z $SOURCE_HOST ] && echo "-h <SOURCE_HOST> is required" && exit 1
-[ -z $DATA_BASE_NAME ] && echo "-n <DATA_BASE_NAME> is required" && exit 1
-[ -z $DESTINATION_OUTPUT_PATH ] && echo "-t <DESTINATION_OUTPUT_PATH> is required" && exit 1
+  if [ -z "${DATABASE_NAME}" ]
+  then
+    echo "-d <DATABASE_NAME> is required" && exit 1
+  fi
+
+  if [ -z "${DESTINATION_OUTPUT_PATH}" ]
+  then
+    echo "-o <DESTINATION_OUTPUT_PATH> is required" && exit 1
+  fi  
+}
+
 
 backup() {
-	ARCHIVE_NAME=mongo_dump_"$(date '+%Y-%m-%d-%H%M').gz"
+  echo "Started ${DATABASE_NAME} Mongo DataBase backup at ${SOURCE_HOST} host"
 
-	echo "Start to backup the Mongo DataBase ${DATA_BASE_NAME} at ${SOURCE_HOST} host"
+  local archive_name=mongo_dump_${DATABASE_NAME}_"$(date '+%Y-%m-%d-%H%M').gz"
 
-	ssh ${USER}@${SOURCE_HOST} "mongodump --archive=${DESTINATION_OUTPUT_PATH}/${ARCHIVE_NAME} --gzip --db ${DATA_BASE_NAME}"
-
-    if [ $? == 0 ]; then
-    	echo "[INFO][$(date -u)]: Successfully created the backup archive ${ARCHIVE_NAME} of the Mongo database ${DATA_BASE_NAME} at ${SOURCE_HOST} host"
-
-     	TEMP_BACKUP_DIR=/tmp/${SOURCE_HOST}
-
-    	sh ${BACKUP_SCRIPTS_DIR}/downloadFiles.sh -u ${USER} -s ${SOURCE_HOST} -f ${DESTINATION_OUTPUT_PATH} -d ${TEMP_BACKUP_DIR} -m ${ARCHIVE_NAME}
-
-    	MONGO_UPLOAD_DIR=${BACKUP_DIR}/MONGO/${SOURCE_HOST}
+  dump_db() {    
+    ssh ${USER}@${SOURCE_HOST} "mongodump --archive=${DESTINATION_OUTPUT_PATH}/${archive_name} --gzip --db ${DATABASE_NAME}"
+  }
+  
+  dump_db
+  
+  echo "[INFO][$(date -u)]: the backup archive ${archive_name} of the Mongo database ${DATABASE_NAME} has been successfully created at ${SOURCE_HOST} host."
+     	
+  MONGO_BACKUP_DIR=${BACKUP_DIR}/Mongo/${SOURCE_HOST}
      
-    	mkdir -p ${MONGO_UPLOAD_DIR}
+  mkdir -p ${MONGO_BACKUP_DIR}
 
-    	cp ${TEMP_BACKUP_DIR}/${ARCHIVE_NAME} ${MONGO_UPLOAD_DIR}
-     
-    	rm -rf ${TEMP_BACKUP_DIR}
-     
-		sh ${BACKUP_SCRIPTS_DIR}/rcloneUploadPath.sh -s ${MONGO_UPLOAD_DIR} -n ${RCLONE_REMOTE_NAME} -d ${SOURCE_HOST}                    
-            
-        exit 0;
+  sh ${BACKUP_SCRIPTS_DIR}/download_files.sh -u ${USER} -s ${SOURCE_HOST} -f ${DESTINATION_OUTPUT_PATH} -d ${MONGO_BACKUP_DIR} -m ${archive_name}
+        
+  sh ${BACKUP_SCRIPTS_DIR}/rclone_upload_path.sh -s ${MONGO_BACKUP_DIR} -n ${RCLONE_REMOTE_NAME} -d ${SOURCE_HOST}/Mongo
 
-    else
-     echo "[INFO][$(date -u)]: Failed to create the backup archive ${ARCHIVE_NAME} of the Mongo database ${DATA_BASE_NAME} at ${SOURCE_HOST} host"
-     exit 1;
-    fi
+  delete_dump_db() {
+    ssh ${USER}@${SOURCE_HOST} "rm ${DESTINATION_OUTPUT_PATH}/${archive_name}"
+  }
+
+  delete_dump_db
 }
 
 echo "-------------------------------------------------------------------------------------"
 echo "-------------------------------------------------------------------------------------"
-echo "-------------------[INFO][$(date -u)]: Mongo Backup Script is run --------------"
+echo "-------------------[INFO][$(date -u)]: Runing Mongo Backup Script --------------"
 echo "-------------------------------------------------------------------------------------"
 echo "-------------------------------------------------------------------------------------"
+
+validate
 
 backup

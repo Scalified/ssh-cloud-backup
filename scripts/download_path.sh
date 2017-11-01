@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Parsing arguments
 while getopts "s:f:d:u:q" opt
@@ -19,5 +19,5 @@ mkdir -p ${DESTINATION_OUTPUT_PATH}
 
 scp -r ${USER}@${SOURCE_HOST}:${SOURCE_INPUT_PATH}/* ${DESTINATION_OUTPUT_PATH}
   
-echo "Completed downloading."
+echo "${SOURCE_INPUT_PATH} path downloading completed."
 
