@@ -7,9 +7,10 @@
 0	5	1	*	*	run-parts /etc/periodic/monthly
 
 TZ=UTC
-00      20      *       *       1-5     /root/.scripts/backup.sh -s swupp-squash-tm.mircloud.us -i /opt/backup/squash-tm --backup-local-archived-path >> /var/log/crond/backup.log
-00      21      *       *       1-5     /root/.scripts/backup.sh -s swupp-squash-tm.mircloud.us -i /opt/backup/squash-tm -o /tmp/backup-squash-tm --backup-path >> /var/log/crond/backup.log
-00      08      *       *       1-5     /root/.scripts/backup.sh -s swupp-squash-tm.mircloud.us -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -m .txt --backup-files >> /var/log/crond/backup.log
-00      09      *       *       1-5     /root/.scripts/backup.sh -s swupp-squash-tm.mircloud.us -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -m 1.txt --backup-files >> /var/log/crond/backup.log
-00      10      *       *       1-5     /root/.scripts/backup_mongo.sh -s node42008-mongo-backup.mircloud.us -d admin -o /tmp >> /var/log/crond/backup.log
+00      20      *       *       1-5     /root/.scripts/backup.sh -s swupp-squash-tm.mircloud.us -i /opt/backup/squash-tm -o /root/.backup/squash-tm -r /squash-tm --pipe-source-archive >> /var/log/crond/backup.log
+00      08      *       *       1-5     /root/.scripts/backup.sh -s swupp-squash-tm.mircloud.us -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -m .txt -r /squash-tm --backup-files >> /var/log/crond/backup.log
+00      09      *       *       1-5     /root/.scripts/backup.sh -s swupp-squash-tm.mircloud.us -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -m 1.txt -r /squash-tm --backup-files >> /var/log/crond/backup.log
+00      09      *       *       1-5     /root/.scripts/backup.sh -s swupp-squash-tm.mircloud.us -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -r /squash-tm/no-archived --backup-path-no-archived >> /var/log/crond/backup.log
+00      09      *       *       1-5     /root/.scripts/backup.sh -s swupp-apsbau-teamcity.mircloud.us -i /data/teamcity_server/datadir/backup -o /tmp/backup-teamcity -r /teamcity --backup-path-no-archived >> /var/log/crond/backup.log
+00      10      *       *       1-5     /root/.scripts/backup_mongo.sh -s node42008-mongo-backup.mircloud.us -d admin -o /tmp/backup-mongo -r /mongo >> /var/log/crond/backup.log
 

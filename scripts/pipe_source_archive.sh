@@ -21,5 +21,5 @@ mkdir -p ${DESTINATION_OUTPUT_PATH}
 
 ssh ${USER}@${SOURCE_HOST} "cd ${SOURCE_INPUT_PATH} && tar -cvf - * | gzip -9" > ${DESTINATION_OUTPUT_PATH}/${archive_name}
 
-echo "${SOURCE_INPUT_PATH} remote path archiving completed to local ${DESTINATION_OUTPUT_PATH} DESTINATION_OUTPUT_PATH"
+echo "${SOURCE_INPUT_PATH} remote path archiving completed to local ${DESTINATION_OUTPUT_PATH} destination path."
 
