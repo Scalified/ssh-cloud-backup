@@ -3,8 +3,6 @@
 set -e
 
 USER=root
-BACKUP_DIR=~/.backup
-RCLONE_REMOTE_NAME="scalified-remote"
 
   # Parsing arguments
   while getopts "s:d:o:r:q" opt

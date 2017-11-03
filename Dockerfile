@@ -10,6 +10,7 @@ ENV SSH_DIR /root/.ssh
 ENV BACKUP_DIR /root/.backup
 ENV RCLONE_URL https://downloads.rclone.org/rclone-current-linux-amd64.zip
 ENV RCLONE_ARCHIVE rclone.zip
+ENV RCLONE_REMOTE_NAME backup-gdrive-remote
 
 RUN apk add --update --no-cache curl \
     unzip bash
