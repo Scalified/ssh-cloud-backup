@@ -2,15 +2,16 @@ FROM scalified/alpine-cron:latest
 
 ENV RCLONE_HOME /opt/rclone
 ENV RCLONE_CONFIG_DIR /root/.config/rclone
-ENV BACKUP_SCRIPTS_DIR /root/.scripts
 ENV CRONTABS_DIR /etc/crontabs
 ENV ROOT_CRONTABS_FILE $CRONTABS_DIR/root
 ENV CRON_LOG_DIR /var/log/crond
 ENV SSH_DIR /root/.ssh
-ENV BACKUP_DIR /root/.backup
 ENV RCLONE_URL https://downloads.rclone.org/rclone-current-linux-amd64.zip
 ENV RCLONE_ARCHIVE rclone.zip
-ENV RCLONE_REMOTE_NAME backup-gdrive-remote
+
+ENV BACKUP_SCRIPTS_DIR /root/.scripts
+ENV BACKUP_DIR /root/.backup
+ENV RCLONE_REMOTE_NAME backup-remote
 
 RUN apk add --update --no-cache curl \
     unzip bash

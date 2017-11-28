@@ -1,143 +1,134 @@
-# Alpine Auto-Backup Docker
+# SSH Cloud Backup (Alpine Docker Image)
 
-## Description
+This docker image is intended for performing periodic backups via ssh. It consists of three main elements:
 
-This docker image is intended for:
+1. Pre-configured cron (based on [alpine-cron](https://store.docker.com/community/images/scalified/alpine-cron) Docker image)
 
-* **databases, files and directories backup**
-* **backup scripts execution scheduling (using cron)**
-* **uploading files to cloud storage (using rclone)**
+2. Set of bash scripts to perform various kinds of backups
 
-## Dockerhub
+   * **backup files/folders into an archive**
+   * **backup files/folders without archiving (as is)**
+   * **backup files by mask with/without archiving**
+   * **backup Mongo databases**
 
-**`docker pull scalified/ssh-cloud-backup`**
+3. Pre-installed [rclone](https://rclone.org/) for saving backups to various cloud storage providers.
 
-## Version
+This picture shows the main workflow of the implemented approach:
+[TODO](http://www.scalified.com)
 
-| #      | Version |
-|--------|---------|
-| Alpine | 3.4     |
+> **Note:** In order to use this Docker image, first of all, you need to configure ssh connection between backup host and all the source hosts. Second step is to configure at least one rclone "remote" to be used as cloud-storage. Last step is to configure cron to execute backups in a timely manner.
 
+Rclone Configuration
+-------------
 
-## Volumes
+Assuming you've already set up ssh connections, you can start using backup scripts. However, to let them upload backups to the cloud you need to [configure rclone](https://rclone.org/docs/). Basically, it can be done by executing `$ rclone config` on backup host.
 
-* **`/root/.backup`**
-* **`/root/.ssh`**
-* **`/root/.config/rclone`**
-* **`/etc/crontabs`**
+After providing cloud storage credentials as well as other configuration details, the configuration file will be created at: `/root/.config/rclone`
 
-## Rclone Configuration
+> **Note:** Rclone's "remote" name must be the same as specified in `RCLONE_REMOTE_NAME` environment variable  (`backup-remote` by default).
 
-In order to start using rclone, it must be configured using the following command:
+Supported Backup Scripts
+-------------
 
-**`$ rclone config`**
+### backup.sh
 
-After providing cloud storage credentials as well as other configuration details, the configuration file will be created at:
+Allows to perform the following actions:
 
-**`/root/.config/rclone`**
+* backup the directory into an archive
 
-## Main scripts
+* backup the directory as is (without archiving)
 
-* **backup.sh**
+* backup files by mask with/without archiving
 
-* **backup_mongo.sh**
+#### Required arguments:
 
-
-#### Description
-
-
-**backup.sh** - allows to perform the following actions:
-
-* **local path archiving**
-
-* **remote path archiving**
-
-* **remote path archiving without storing archive remotely (using pipes)**
-
-* **files archiving by mask**
-
-**Required arguments:**
-
-   **`-s|--source-host`** - the source host to backup from
+* `-s|--source-host` - the source host to backup from
     
-   **`-i|--input-path`** - the source input path to backup
+* `-i|--input-path` - the input path to backup (source host)
     
-   **`-o|--output-path`** - the local path to put the archive to
-    
-   **`-r|--remote-path`** - the path on the cloud storage to store the archive in
-    
-   **Additional arguments:**
-    
-   **`-m|--mask`** - the backup file mask
-    
-   **`--keep-source-archive`** - if specified, the backup archive will be created and won't be deleted after downloading. Default remote path is /tmp 
+* `-o|--output-path` - the path where file/s should be saved (backup host)
    
-   **`--backup-files`** - the backup files mask. Used with the argument **`-m|--mask`**
+* `-r|--remote-path` - the path on the cloud storage to store backups at
+    
+#### Additional arguments:
+    
+* `-m|--mask` - the backup file/s mask.
+    
+* `--keep-source-archive` - if specified, the backup archive will be created at source host and won't be deleted after downloading with scp. Default path where archives are kept is `/tmp`
    
-   **`--pipe-source-archive`** - if specified, the backup archive will be created and downloaded locally without creating an archive on remote host
+* `--backup-files` - the backup files mask. Used along with the argument `-m|--mask`
+   
+* `--pipe-source-archive` - if specified, the backup archive will be created and downloaded without creating an archive on remote host (using pipes)
 
-   **`--backup-path-no-archived`** - if specified, an archive won't be created on remote host
+* `--backup-path-no-archived` - if specified, no archiving will be performed, e.g. directory will be backed up as is(useful when the directory already contains some backup files that just need to be replicated to cloud storage)
    
    
-   Examples of script running
+#### Examples of script usage:
    
-   * **backup the remote path, do not create the archive on remote host**
+* backup the remote path, do not create the archive on remote host
    
-       **`backup.sh -s swupp-squash-tm.mircloud.us -i /opt/backup/squash-tm -o /root/.backup/squash-tm -r /squash-tm --pipe-source-archive`**
+    `backup.sh -s <source-host> -i /opt/backup/squash-tm -o /root/.backup/squash-tm -r /squash-tm --pipe-source-archive`
+  
+* backup files using txt mask
    
-   * **backup files using txt mask**
-   
-       **`backup.sh -s swupp-squash-tm.mircloud.us -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -m .txt -r /squash-tm --backup-files`**
+    `backup.sh -s <source-host> -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -m .txt -r /squash-tm --backup-files`
        
-   * **backup 1.txt file**
+* backup 1.txt file
    
-       **`backup.sh -s swupp-squash-tm.mircloud.us -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -m 1.txt -r /squash-tm --backup-files`**
+    `backup.sh -s <source-host> -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -m 1.txt -r /squash-tm --backup-files`
        
-   * **backup the path as is without creating its archive**
+* backup the path as is without creating its archive
    
-       **`backup.sh -s swupp-squash-tm.mircloud.us -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -r /squash-tm/no-archived --backup-path-no-archived`**
+    `backup.sh -s <source-host> -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -r /squash-tm/no-archived --backup-path-no-archived`
        
-   * **backup the path, keep archive on the remote host after its download**
+* backup the path, keep archive on the remote host after its download
    
-       **`backup.sh -s swupp-squash-tm.mircloud.us -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -r /squash-tm --keep-source-archive`**
+    `backup.sh -s <source-host> -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -r /squash-tm --keep-source-archive`
                
 
-**backup_mongo.sh** - creates a Mongo DB dump.
+### backup_mongo.sh
 
-   **Required arguments:**
+Creates a MongoDB dump.
+
+#### Required arguments:
     
-   **`-s|--source-host`** - the source host with Mongo DB running
+* `-s|--source-host` - the source host with MongoDB server running
         
-   **`-d`** - the Mongo DB name to backup
+* `-d` - name of the database to backup
         
-   **`-o|--output-path`** - the local path to put Mongo DB dump into
+* `-o|--output-path` - the local path to put MongoDB dump
         
-   **`-r|--remote-path`** - the path on the cloud storage to put Mongo DB dump into
+* `-r|--remote-path` - the path on the cloud storage to put MongoDB dump
    
     
-   Examples of script running:
+#### Examples of script usage:
    
-   * **backup mongo database**
+* backup Mongo database
    
-       **`backup_mongo.sh -s node42008-mongo-backup.mircloud.us -d admin -o /tmp/backup-mongo -r /mongo`**       
+    `backup_mongo.sh -s your_mongo_server_domain_name -d admin -o /tmp/backup-mongo -r /mongo`
 
-## Logging
+## Periodic Scripts Execution
 
-The log file is located **`/var/log/crond/backup.log`**
- 
-## Periodic Backups
+Here's an example of [/etc/crontabs/root](./crontabs/root) file which is used by cron to execute it's jobs.
 
-The Performing daily backups is configured in **/etc/crontabs/root** file.
+## Docker Store
 
-## Docker image
+To pull the image from [Docker Store](https://store.docker.com/community/images/scalified/ssh-cloud-backup):
 
-#### Building Docker Image
+    docker pull scalified/ssh-cloud-backup
 
-`docker build . -t <tag>`
+## Supported environment variables
 
-#### Running Docker Image
+* `RCLONE_REMOTE_NAME` - rclone remote name to be used for backups.
+* `BACKUP_SCRIPTS_DIR` - ???
+* `BACKUP_DIR` - ???
+    
+## Volumes
 
-`docker run -it scalified/ssh-cloud-backup /bin/sh`
+* `/root/.backup` - the folder into wich the backup data is put, which will be synchronized by the rclone with a cloud storage
+* `/root/.ssh` - the ssh config folder
+* `/root/.config/rclone` - the rclone configuration path
+* `/etc/crontabs` - the path where the root cron file is located
 
 ## Scalified Links
 
