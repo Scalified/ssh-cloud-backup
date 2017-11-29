@@ -14,7 +14,8 @@ This docker image is intended for performing periodic backups via ssh. It consis
 3. Pre-installed [rclone](https://rclone.org/) for saving backups to various cloud storage providers.
 
 This picture shows the main workflow of the implemented approach:
-[TODO](http://www.scalified.com)
+
+![](./img/drawing.png)
 
 > **Note:** In order to use this Docker image, first of all, you need to configure ssh connection between backup host and all the source hosts. Second step is to configure at least one rclone "remote" to be used as cloud-storage. Last step is to configure cron to execute backups in a timely manner.
 
@@ -46,7 +47,7 @@ Allows to perform the following actions:
     
 * `-i|--input-path` - the input path to backup (source host)
     
-* `-o|--output-path` - the path where file/s should be saved (backup host)
+* `-o|--output-path` - the path where file/s should be saved (on backup host)
    
 * `-r|--remote-path` - the path on the cloud storage to store backups at
     
@@ -119,10 +120,18 @@ To pull the image from [Docker Store](https://store.docker.com/community/images/
 
 ## Supported environment variables
 
-* `RCLONE_REMOTE_NAME` - rclone remote name to be used for backups.
-* `BACKUP_SCRIPTS_DIR` - ???
-* `BACKUP_DIR` - ???
+* `RCLONE_REMOTE_NAME` - rclone remote name to be used for backups (default `backup-remote`)
+* `BACKUP_SCRIPTS_DIR` - the path where backup scrips are located (default `/root/.scripts`)
+* `BACKUP_DIR` - the path where backups are saved on backup host (`/root/.backup`)
     
+
+## Supported build arguments
+
+* `RCLONE_REMOTE_NAME`, `BACKUP_SCRIPTS_DIR`, `BACKUP_DIR`
+* `SSH_DIR` - the directory where ssh keys will be placed, to be added as volume (default `/root/.ssh`)
+* `RCLONE_URL` - the url where rclone distributive is hosted (default `https://downloads.rclone.org/rclone-current-linux-amd64.zip`)
+* see [Dockerfile](./Dockerfile) for others
+
 ## Volumes
 
 * `/root/.backup` - the folder into wich the backup data is put, which will be synchronized by the rclone with a cloud storage
