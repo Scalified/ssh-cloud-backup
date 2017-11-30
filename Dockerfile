@@ -37,13 +37,13 @@ RUN mkdir -p $RCLONE_CONFIG_DIR \
     $SSH_DIR \
     $BACKUP_DIR
 
-COPY scripts/* $BACKUP_SCRIPTS_DIR/
+COPY scripts $BACKUP_SCRIPTS_DIR
 
 RUN dos2unix $BACKUP_SCRIPTS_DIR/*.sh          
 
 RUN chmod u+x $BACKUP_SCRIPTS_DIR/*.sh
 
-COPY crontabs/root $CRONTABS_DIR
+COPY crontabs/root $CRONTABS_DIR/root
 
 RUN chmod 600 $CRONTABS_DIR/root
           
