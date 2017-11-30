@@ -7,10 +7,10 @@
 0	5	1	*	*	run-parts /etc/periodic/monthly
 
 #TZ=UTC
-#00      20      *       *       1-5     sh --login -c '/root/.scripts/backup.sh -s <source-host> -i /opt/backup/squash-tm -o /root/.backup/squash-tm -r /squash-tm --pipe-source-archive >> /var/log/crond/backup.log 2>&1'
-#00      08      *       *       1-5     sh --login -c '/root/.scripts/backup.sh -s <source-host> -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -m .txt -r /squash-tm --backup-files >> /var/log/crond/backup.log 2>&1'
-#00      09      *       *       1-5     sh --login -c '/root/.scripts/backup.sh -s <source-host> -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -m 1.txt -r /squash-tm --backup-files >> /var/log/crond/backup.log 2>&1'
-#00      09      *       *       1-5     sh --login -c '/root/.scripts/backup.sh -s <source-host> -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -r /squash-tm/no-archived --backup-path-no-archived >> /var/log/crond/backup.log 2>&1'
-#00      09      *       *       1-5     sh --login -c '/root/.scripts/backup.sh -s <source-host> -i /data/teamcity_server/datadir/backup -o /tmp/backup-teamcity -r /teamcity --backup-path-no-archived >> /var/log/crond/backup.log 2>&1'
-#00      10      *       *       1-5     sh --login -c '/root/.scripts/backup_mongo.sh -s <source-host> -d admin -o /tmp/backup-mongo -r /mongo >> /var/log/crond/backup.log 2>&1'
+#00      20      *       *       1-5     sh --login -c '/root/.scripts/backup.sh -s <source-host> -i /opt/backup/squash-tm -o /root/.backup/squash-tm -r /squash-tm --pipe-source-archive >> $BACKUP_LOG_DIR/backup.log 2>&1'
+#00      08      *       *       1-5     sh --login -c '/root/.scripts/backup.sh -s <source-host> -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -m .txt -r /squash-tm --backup-files >> $BACKUP_LOG_DIR/backup.log 2>&1'
+#00      09      *       *       1-5     sh --login -c '/root/.scripts/backup.sh -s <source-host> -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -m 1.txt -r /squash-tm --backup-files >> $BACKUP_LOG_DIR/backup.log 2>&1'
+#00      09      *       *       1-5     sh --login -c '/root/.scripts/backup.sh -s <source-host> -i /opt/backup/squash-tm -o /tmp/backup-squash-tm -r /squash-tm/no-archived --backup-path-no-archived >> $BACKUP_LOG_DIR/backup.log 2>&1'
+#00      09      *       *       1-5     sh --login -c '/root/.scripts/backup.sh -s <source-host> -i /data/teamcity_server/datadir/backup -o /tmp/backup-teamcity -r /teamcity --backup-path-no-archived >> $BACKUP_LOG_DIR/backup.log 2>&1'
+#00      10      *       *       1-5     sh --login -c '/root/.scripts/backup_mongo.sh -s <source-host> -d admin -o /tmp/backup-mongo -r /mongo >> $BACKUP_LOG_DIR/backup.log 2>&1'
 

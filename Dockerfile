@@ -1,13 +1,13 @@
 FROM scalified/alpine-cron:latest
 
-ARG RCLONE_HOME = /opt/rclone
-ARG RCLONE_CONFIG_DIR = /root/.config/rclone
-ARG CRONTABS_DIR = /etc/crontabs
-ARG ROOT_CRONTABS_FILE = $CRONTABS_DIR/root
-ARG CRON_LOG_DIR = /var/log/crond
-ARG SSH_DIR = /root/.ssh
-ARG RCLONE_URL = https://downloads.rclone.org/rclone-current-linux-amd64.zip
-ARG RCLONE_ARCHIVE = rclone.zip
+ARG RCLONE_HOME=/opt/rclone
+ARG RCLONE_CONFIG_DIR=/root/.config/rclone
+ARG SSH_DIR=/root/.ssh
+ARG RCLONE_URL=https://downloads.rclone.org/rclone-current-linux-amd64.zip
+ARG RCLONE_ARCHIVE=rclone.zip
+
+ARG BACKUP_LOG_DIR
+ENV BACKUP_LOG_DIR ${BACKUP_LOG_DIR:-/var/log/crond}
 
 ARG BACKUP_SCRIPTS_DIR
 ENV BACKUP_SCRIPTS_DIR ${BACKUP_SCRIPTS_DIR:-/root/.scripts}
@@ -18,8 +18,7 @@ ENV RCLONE_REMOTE_NAME ${RCLONE_REMOTE_NAME:-backup-remote}
 ARG BACKUP_DIR
 ENV BACKUP_DIR ${BACKUP_DIR:-/root/.backup}
 
-RUN apk add --update --no-cache curl \
-    unzip bash
+RUN apk add --update --no-cache curl unzip bash
 
 RUN mkdir -p $RCLONE_HOME
 
@@ -34,8 +33,7 @@ RUN ln -s $RCLONE_HOME/rclone /usr/bin/rclone
     
 RUN mkdir -p $RCLONE_CONFIG_DIR \
     $BACKUP_SCRIPTS_DIR \
-    $CRONTABS_DIR \ 
-    $CRON_LOG_DIR \
+    $BACKUP_LOG_DIR \
     $SSH_DIR \
     $BACKUP_DIR
 
@@ -47,9 +45,8 @@ RUN chmod u+x $BACKUP_SCRIPTS_DIR/*.sh
 
 COPY crontabs/root $CRONTABS_DIR
 
-RUN chmod 600 $ROOT_CRONTABS_FILE
+RUN chmod 600 $CRONTABS_DIR/root
           
-VOLUME $BACKUP_DIR
 VOLUME $SSH_DIR
+VOLUME $BACKUP_DIR
 VOLUME $RCLONE_CONFIG_DIR
-VOLUME $CRONTABS_DIR

@@ -137,7 +137,6 @@ To pull the image from [Docker Store](https://store.docker.com/community/images/
 * `/root/.backup` - the folder into wich the backup data is put, which will be synchronized by the rclone with a cloud storage
 * `/root/.ssh` - the ssh config folder
 * `/root/.config/rclone` - the rclone configuration path
-* `/etc/crontabs` - the path where the root cron file is located
 
 ## Scalified Links
 
